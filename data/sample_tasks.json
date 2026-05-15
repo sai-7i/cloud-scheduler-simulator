@@ -1,0 +1,47 @@
+[
+  {
+    "name": "task-1",
+    "required_cpu": 2,
+    "required_memory": 4,
+    "duration": 5,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 12
+  },
+  {
+    "name": "task-2",
+    "required_cpu": 3,
+    "required_memory": 6,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 2,
+    "deadline": 10
+  },
+  {
+    "name": "task-3",
+    "required_cpu": 1,
+    "required_memory": 2,
+    "duration": 3,
+    "submit_time": 2,
+    "priority": 0,
+    "deadline": null
+  },
+  {
+    "name": "task-4",
+    "required_cpu": 4,
+    "required_memory": 8,
+    "duration": 6,
+    "submit_time": 3,
+    "priority": 3,
+    "deadline": 18
+  },
+  {
+    "name": "task-5",
+    "required_cpu": 2,
+    "required_memory": 4,
+    "duration": 2,
+    "submit_time": 4,
+    "priority": 1,
+    "deadline": 9
+  }
+]

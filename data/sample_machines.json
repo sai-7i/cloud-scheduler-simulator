@@ -1,0 +1,20 @@
+[
+  {
+    "name": "node-a",
+    "total_cpu": 4,
+    "total_memory": 8,
+    "enabled": true
+  },
+  {
+    "name": "node-b",
+    "total_cpu": 6,
+    "total_memory": 12,
+    "enabled": true
+  },
+  {
+    "name": "node-c",
+    "total_cpu": 8,
+    "total_memory": 16,
+    "enabled": true
+  }
+]

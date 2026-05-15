@@ -1,0 +1,14 @@
+[
+  {
+    "name": "stress-a",
+    "total_cpu": 2,
+    "total_memory": 4,
+    "enabled": true
+  },
+  {
+    "name": "stress-b",
+    "total_cpu": 3,
+    "total_memory": 6,
+    "enabled": true
+  }
+]

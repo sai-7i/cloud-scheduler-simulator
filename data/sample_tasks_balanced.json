@@ -1,0 +1,38 @@
+[
+  {
+    "name": "balanced-task-1",
+    "required_cpu": 2,
+    "required_memory": 4,
+    "duration": 4,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 10
+  },
+  {
+    "name": "balanced-task-2",
+    "required_cpu": 2,
+    "required_memory": 4,
+    "duration": 4,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 10
+  },
+  {
+    "name": "balanced-task-3",
+    "required_cpu": 2,
+    "required_memory": 4,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 1,
+    "deadline": 12
+  },
+  {
+    "name": "balanced-task-4",
+    "required_cpu": 2,
+    "required_memory": 4,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 1,
+    "deadline": 12
+  }
+]

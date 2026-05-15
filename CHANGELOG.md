@@ -1,0 +1,131 @@
+# 变更日志
+
+本文档记录项目各版本的重要发布内容。
+
+## v1.0.0
+
+发布日期：2026-05-15
+
+### 版本定位
+
+这是项目的第一个可发布版本，目标是交付一个可运行、可演示、可用于教学的云数据中心资源调度模拟器 MVP。
+
+当前版本聚焦：
+- CPU 与内存双资源调度
+- 物理机与任务配置管理
+- 离散时间仿真
+- 基础算法对比
+- 中文前端展示与图表分析
+
+### 新增内容
+
+#### 后端
+- 新增 FastAPI 后端服务。
+- 新增健康检查接口：`GET /health`。
+- 新增物理机、任务、仿真三类 API。
+- 新增 SQLite 持久化。
+- 使用 Python 内置 `sqlite3` 和原生 SQL 实现数据访问。
+- 新增仿真结果持久化，保存时间线、资源历史和指标。
+
+#### 仿真核心
+- 新增物理机领域对象与任务领域对象。
+- 新增集群资源分配与释放逻辑。
+- 新增离散时间仿真引擎。
+- 新增指标计算逻辑。
+
+#### 已支持调度算法
+- `first_fit`
+- `best_fit`
+- `worst_fit`
+- `round_robin`
+- `least_loaded`
+- `cfs_like`
+
+#### 前端
+- 新增 Vue 3 前端界面。
+- 新增物理机配置页面。
+- 新增任务配置页面。
+- 新增仿真运行页面。
+- 新增概览页面。
+- 新增指标卡片、资源利用率图表和任务时间线图。
+- 新增物理机与任务的前端编辑能力。
+- 新增最近一次仿真摘要展示。
+
+#### 示例数据与演示支持
+- 新增 `data/sample_machines.json`。
+- 新增 `data/sample_tasks.json`。
+- 新增示例物理机导入接口：`POST /api/machines/import-sample`。
+- 新增示例任务导入接口：`POST /api/tasks/import-sample`。
+- 新增内置演示任务生成接口：`POST /api/tasks/generate`。
+
+#### 文档
+- 新增 `README.md`。
+- 新增架构说明：`docs/architecture.md`。
+- 新增 API 文档：`docs/api.md`。
+- 新增算法文档：`docs/algorithms.md`。
+- 新增数据库文档：`docs/database.md`。
+
+### 本版本支持的主要接口
+
+#### 物理机
+- `GET /api/machines`
+- `POST /api/machines`
+- `PUT /api/machines/{id}`
+- `POST /api/machines/batch`
+- `POST /api/machines/import-sample`
+- `DELETE /api/machines/{id}`
+
+#### 任务
+- `GET /api/tasks`
+- `POST /api/tasks`
+- `PUT /api/tasks/{id}`
+- `POST /api/tasks/generate`
+- `POST /api/tasks/import-sample`
+- `DELETE /api/tasks/{id}`
+
+#### 仿真
+- `POST /api/simulations/run`
+- `GET /api/simulations/latest`
+- `GET /api/simulations/{id}`
+- `GET /api/simulations/{id}/results`
+- `GET /api/simulations/{id}/metrics`
+
+### 已完成验证
+
+发布前已完成以下验证：
+- 后端测试通过：`21 passed`
+- 前端生产构建通过：`npm run build`
+- 健康检查接口可用
+- 示例物理机导入可用
+- 示例任务导入可用
+- 以下 6 个算法都已通过真实 HTTP 仿真验证：
+  - `first_fit`
+  - `best_fit`
+  - `worst_fit`
+  - `round_robin`
+  - `least_loaded`
+  - `cfs_like`
+
+### 已知限制
+
+当前版本仍然有以下边界：
+- 只建模 CPU 和内存，不包含磁盘和网络带宽。
+- 不支持抢占式调度。
+- 不支持任务迁移。
+- 不支持物理机故障与恢复。
+- 不支持自动扩缩容。
+- 不支持多租户公平性。
+- 不包含遗传算法、强化学习或更复杂的优化算法。
+
+此外需要注意：
+- `cfs_like` 是教学用简化实现，不是 Linux CFS 的完整实现。
+- `least_loaded` 当前采用“CPU 利用率优先，内存利用率次之”的简化负载定义。
+- 仿真结果中的复杂结构当前保存在 SQLite 的 JSON 字符串字段中。
+
+### 升级建议
+
+后续版本建议优先考虑：
+- `priority`、`sjf`、`edf` 等队列选择策略。
+- 更完整的多维资源均衡策略。
+- 更细粒度的仿真结果结构化存储。
+- 启动脚本、Docker 或部署支持。
