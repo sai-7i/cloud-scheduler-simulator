@@ -1,0 +1,56 @@
+[
+  {
+    "name": "deadline-tight-api-1",
+    "required_cpu": 2,
+    "required_memory": 2048,
+    "duration": 3,
+    "submit_time": 0,
+    "priority": 4,
+    "deadline": 4
+  },
+  {
+    "name": "deadline-tight-api-2",
+    "required_cpu": 2,
+    "required_memory": 2048,
+    "duration": 3,
+    "submit_time": 0,
+    "priority": 4,
+    "deadline": 4
+  },
+  {
+    "name": "deadline-batch-long-1",
+    "required_cpu": 4,
+    "required_memory": 5120,
+    "duration": 9,
+    "submit_time": 0,
+    "priority": 0,
+    "deadline": 15
+  },
+  {
+    "name": "deadline-batch-long-2",
+    "required_cpu": 4,
+    "required_memory": 5120,
+    "duration": 9,
+    "submit_time": 1,
+    "priority": 0,
+    "deadline": 16
+  },
+  {
+    "name": "deadline-tight-report",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 4,
+    "submit_time": 2,
+    "priority": 3,
+    "deadline": 7
+  },
+  {
+    "name": "deadline-loose-background",
+    "required_cpu": 2,
+    "required_memory": 3072,
+    "duration": 6,
+    "submit_time": 3,
+    "priority": 1,
+    "deadline": 18
+  }
+]

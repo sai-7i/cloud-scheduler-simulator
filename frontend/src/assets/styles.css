@@ -33,20 +33,24 @@ button {
 }
 
 .app-shell {
-  display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
   min-height: 100vh;
 }
 
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 24px;
+  width: 280px;
+  height: 100vh;
   padding: 32px 24px;
   border-right: 1px solid rgba(173, 214, 255, 0.14);
   background: rgba(4, 12, 24, 0.7);
   backdrop-filter: blur(18px);
+  overflow-y: auto;
 }
 
 .sidebar h1,
@@ -88,6 +92,7 @@ button {
 }
 
 .content {
+  margin-left: 280px;
   padding: 32px;
 }
 
@@ -202,6 +207,11 @@ button {
   cursor: pointer;
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 .button.secondary {
   color: #d9ecff;
   background: rgba(123, 215, 255, 0.12);
@@ -261,9 +271,61 @@ button {
   color: #90d6b8;
 }
 
+.compare-time-field {
+  max-width: 320px;
+}
+
+.algorithm-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.algorithm-choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 10px;
+  padding: 14px;
+  border: 1px solid rgba(150, 204, 255, 0.14);
+  border-radius: 14px;
+  background: rgba(9, 20, 34, 0.72);
+}
+
+.algorithm-choice input {
+  margin-top: 4px;
+}
+
+.algorithm-choice span {
+  color: #dcecff;
+  font-weight: 600;
+}
+
+.algorithm-choice small {
+  grid-column: 2;
+  color: #9ab6d3;
+}
+
 .dataset-hint-panel {
   display: grid;
   gap: 8px;
+}
+
+.dataset-import-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.dataset-import-controls {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.compact-hint {
+  padding: 14px;
+  border: 1px solid rgba(150, 204, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(9, 20, 34, 0.56);
 }
 
 .dataset-hint-title {
@@ -299,19 +361,29 @@ button {
 }
 
 @media (max-width: 960px) {
-  .app-shell {
-    grid-template-columns: 1fr;
-  }
-
   .sidebar {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow-y: visible;
     border-right: 0;
     border-bottom: 1px solid rgba(173, 214, 255, 0.14);
   }
 
+  .content {
+    margin-left: 0;
+  }
+
   .metrics-grid,
   .two-column,
-  .form-grid {
+  .form-grid,
+  .algorithm-choice-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dataset-import-controls {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .chart-header {

@@ -30,7 +30,7 @@
           <button class="button" type="submit">开始运行</button>
         </div>
       </form>
-      <p v-if="simulationId" class="form-message">最近一次仿真 ID：{{ simulationId }}</p>
+      <p v-if="successMessage" class="form-message">{{ successMessage }}</p>
       <p v-if="errorMessage" class="form-message error-message">{{ errorMessage }}</p>
     </section>
 
@@ -39,12 +39,14 @@
       <MetricCard label="拒绝率" :value="metrics.rejection_rate" />
       <MetricCard label="总完成时间" :value="metrics.makespan" />
       <MetricCard label="平均等待时间" :value="metrics.average_waiting_time" />
+      <MetricCard label="最长等待时间" :value="metrics.max_waiting_time" />
+      <MetricCard label="截止期违约率" :value="metrics.deadline_miss_rate" />
     </section>
 
     <section v-if="resourceHistory.length > 0" class="two-column">
       <EChartPanel
         title="资源利用率趋势"
-        description="展示各时间片下集群平均 CPU 与内存利用率变化。"
+        description="展示各时间片下集群平均 CPU 与内存利用率变化（百分比）。"
         :option="resourceOption"
       />
       <EChartPanel
@@ -92,7 +94,7 @@ const EChartPanel = defineAsyncComponent(() => import('../components/EChartPanel
 const metrics = ref(null)
 const timeline = ref([])
 const resourceHistory = ref([])
-const simulationId = ref(null)
+const successMessage = ref('')
 const errorMessage = ref('')
 const form = ref({
   algorithm: 'first_fit',
@@ -129,18 +131,18 @@ const resourceOption = computed(() => {
       type: 'value',
       min: 0,
       max: 1,
-      axisLabel: { color: '#9ab6d3' },
+      axisLabel: { color: '#9ab6d3', formatter: (value) => `${Math.round(value * 100)}%` },
       splitLine: { lineStyle: { color: 'rgba(173, 214, 255, 0.08)' } },
     },
     series: [
       {
-        name: '平均 CPU 利用率',
+        name: '平均 CPU 利用率（%）',
         type: 'line',
         smooth: true,
         data: cpu,
       },
       {
-        name: '平均内存利用率',
+        name: '平均内存利用率（%）',
         type: 'line',
         smooth: true,
         data: memory,
@@ -190,12 +192,13 @@ const timelineOption = computed(() => ({
 
 async function handleRun() {
   errorMessage.value = ''
+  successMessage.value = ''
   try {
     const response = await runSimulation(form.value)
-    simulationId.value = response.data.id
     metrics.value = response.data.metrics
     timeline.value = response.data.timeline
     resourceHistory.value = response.data.resource_history
+    successMessage.value = '仿真运行完成，结果仅保留在当前页面。'
   } catch (error) {
     errorMessage.value = error.response?.data?.detail || '仿真运行失败，请检查输入数据。'
   }

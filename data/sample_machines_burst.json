@@ -1,24 +1,18 @@
 [
   {
-    "name": "balanced-a",
+    "name": "burst-a",
     "total_cpu": 6,
     "total_memory": 10240,
     "enabled": true
   },
   {
-    "name": "balanced-b",
+    "name": "burst-b",
     "total_cpu": 6,
     "total_memory": 10240,
     "enabled": true
   },
   {
-    "name": "balanced-c",
-    "total_cpu": 6,
-    "total_memory": 10240,
-    "enabled": true
-  },
-  {
-    "name": "balanced-d",
+    "name": "burst-c",
     "total_cpu": 6,
     "total_memory": 10240,
     "enabled": true

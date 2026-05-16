@@ -1,38 +1,92 @@
 [
   {
-    "name": "balanced-task-1",
-    "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 4,
+    "name": "balanced-wave-1-a",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 9,
     "submit_time": 0,
     "priority": 1,
-    "deadline": 10
+    "deadline": 14
   },
   {
-    "name": "balanced-task-2",
-    "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 4,
+    "name": "balanced-wave-1-b",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 9,
     "submit_time": 0,
     "priority": 1,
-    "deadline": 10
+    "deadline": 14
   },
   {
-    "name": "balanced-task-3",
-    "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 4,
-    "submit_time": 1,
+    "name": "balanced-wave-1-c",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 9,
+    "submit_time": 0,
     "priority": 1,
-    "deadline": 12
+    "deadline": 14
   },
   {
-    "name": "balanced-task-4",
-    "required_cpu": 2,
-    "required_memory": 4,
+    "name": "balanced-wave-1-d",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 9,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 14
+  },
+  {
+    "name": "balanced-wave-2-a",
+    "required_cpu": 3,
+    "required_memory": 4096,
     "duration": 4,
     "submit_time": 1,
+    "priority": 2,
+    "deadline": 9
+  },
+  {
+    "name": "balanced-wave-2-b",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 2,
+    "deadline": 9
+  },
+  {
+    "name": "balanced-wave-2-c",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 2,
+    "deadline": 9
+  },
+  {
+    "name": "balanced-wave-2-d",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 2,
+    "deadline": 9
+  },
+  {
+    "name": "balanced-urgent-small",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 2,
+    "submit_time": 2,
+    "priority": 4,
+    "deadline": 5
+  },
+  {
+    "name": "balanced-background-small",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 6,
+    "submit_time": 2,
     "priority": 1,
-    "deadline": 12
+    "deadline": null
   }
 ]

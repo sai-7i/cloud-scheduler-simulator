@@ -45,13 +45,6 @@ def initialize_database() -> None:
                 deadline INTEGER NULL
             );
 
-            CREATE TABLE IF NOT EXISTS simulations (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                algorithm TEXT NOT NULL,
-                max_time INTEGER NOT NULL,
-                timeline_json TEXT NOT NULL,
-                resource_history_json TEXT NOT NULL,
-                metrics_json TEXT NOT NULL
-            );
+            DROP TABLE IF EXISTS simulations;
             """
         )

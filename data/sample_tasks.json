@@ -1,47 +1,74 @@
 [
   {
-    "name": "task-1",
-    "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 5,
+    "name": "cpu-batch-large",
+    "required_cpu": 6,
+    "required_memory": 4096,
+    "duration": 8,
     "submit_time": 0,
     "priority": 1,
+    "deadline": 14
+  },
+  {
+    "name": "memory-analytics-large",
+    "required_cpu": 2,
+    "required_memory": 12288,
+    "duration": 7,
+    "submit_time": 0,
+    "priority": 2,
     "deadline": 12
   },
   {
-    "name": "task-2",
-    "required_cpu": 3,
-    "required_memory": 6,
-    "duration": 4,
+    "name": "balanced-service",
+    "required_cpu": 4,
+    "required_memory": 8192,
+    "duration": 6,
     "submit_time": 1,
-    "priority": 2,
+    "priority": 1,
+    "deadline": 13
+  },
+  {
+    "name": "urgent-small-api",
+    "required_cpu": 1,
+    "required_memory": 2048,
+    "duration": 2,
+    "submit_time": 1,
+    "priority": 3,
+    "deadline": 5
+  },
+  {
+    "name": "cpu-batch-medium",
+    "required_cpu": 5,
+    "required_memory": 3072,
+    "duration": 5,
+    "submit_time": 2,
+    "priority": 0,
+    "deadline": 11
+  },
+  {
+    "name": "memory-cache-warmup",
+    "required_cpu": 2,
+    "required_memory": 10240,
+    "duration": 4,
+    "submit_time": 3,
+    "priority": 1,
     "deadline": 10
   },
   {
-    "name": "task-3",
+    "name": "tiny-background-job",
     "required_cpu": 1,
-    "required_memory": 2,
+    "required_memory": 1024,
     "duration": 3,
-    "submit_time": 2,
+    "submit_time": 4,
     "priority": 0,
     "deadline": null
   },
   {
-    "name": "task-4",
-    "required_cpu": 4,
-    "required_memory": 8,
-    "duration": 6,
-    "submit_time": 3,
+    "name": "late-interactive-job",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 3,
+    "submit_time": 5,
     "priority": 3,
-    "deadline": 18
-  },
-  {
-    "name": "task-5",
-    "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 2,
-    "submit_time": 4,
-    "priority": 1,
     "deadline": 9
   }
 ]

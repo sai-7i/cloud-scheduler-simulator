@@ -4,9 +4,7 @@
       <div>
         <p class="section-kicker">项目状态</p>
         <h2>调度模拟器概览</h2>
-        <p>
-          当前页面会汇总后端健康状态、资源配置数量，以及最近一次仿真的核心结果。
-        </p>
+        <p>当前页面会汇总后端健康状态、资源配置数量，并提示下一步实验入口。</p>
       </div>
     </header>
 
@@ -14,150 +12,115 @@
       <MetricCard label="后端状态" :value="healthStatus" />
       <MetricCard label="物理机数量" :value="machineCount" />
       <MetricCard label="任务数量" :value="taskCount" />
-      <MetricCard label="最近一次仿真" :value="lastSimulationLabel" />
+      <MetricCard label="结果保存" value="仅当前页" />
     </section>
 
-    <section v-if="latestSimulation" class="metrics-grid">
-      <MetricCard label="最近算法" :value="latestSimulation.algorithm" />
-      <MetricCard label="成功率" :value="latestSimulation.metrics.success_rate" />
-      <MetricCard label="总完成时间" :value="latestSimulation.metrics.makespan" />
-      <MetricCard label="平均等待时间" :value="latestSimulation.metrics.average_waiting_time" />
+    <section class="panel dataset-import-panel">
+      <div>
+        <p class="section-kicker">示例数据</p>
+        <h3>一键导入测试集</h3>
+        <p>同时导入同一套测试集的物理机和任务，避免在两个页面分别操作。</p>
+      </div>
+
+      <div class="dataset-import-controls">
+        <label class="field inline-field">
+          <span>测试集</span>
+          <select v-model="selectedDataset">
+            <option value="default">默认示例</option>
+            <option value="balanced">均衡测试集</option>
+            <option value="stress">压力测试集</option>
+            <option value="fragmented">碎片化测试集</option>
+            <option value="priority">优先级测试集</option>
+            <option value="deadline">截止期测试集</option>
+            <option value="burst">突发流量测试集</option>
+          </select>
+        </label>
+        <button class="button" type="button" :disabled="isImporting" @click="handleImportDataset">
+          {{ isImporting ? '导入中...' : '一键导入机器和任务' }}
+        </button>
+        <button class="button secondary" type="button" :disabled="isClearing" @click="handleClearAll">
+          {{ isClearing ? '清空中...' : '清空机器和任务' }}
+        </button>
+      </div>
+
+      <div class="dataset-hint-panel compact-hint">
+        <p class="dataset-hint-title">{{ datasetInfo[selectedDataset].title }}</p>
+        <p class="dataset-hint-text">{{ datasetInfo[selectedDataset].description }}</p>
+      </div>
+
+      <p v-if="importMessage" class="form-message">{{ importMessage }}</p>
+      <p v-if="importError" class="form-message error-message">{{ importError }}</p>
+      <p v-if="clearMessage" class="form-message">{{ clearMessage }}</p>
+      <p v-if="clearError" class="form-message error-message">{{ clearError }}</p>
     </section>
 
-    <section v-if="latestSimulation" class="two-column">
-      <EChartPanel
-        title="最近一次资源利用率"
-        description="展示最近一次仿真中，各时间片下集群平均 CPU 与内存利用率变化。"
-        :option="resourceOption"
-      />
-      <EChartPanel
-        title="最近一次任务时间线"
-        description="展示最近一次仿真中，每个任务的开始时间和持续时间。"
-        :option="timelineOption"
-      />
-    </section>
-
-    <section v-else class="panel">
-      <h3>最近一次仿真</h3>
-      <p>当前还没有仿真记录。请先前往“仿真”页面运行一次仿真。</p>
+    <section class="panel">
+      <h3>开始实验</h3>
+      <p>本项目不保存仿真历史。运行仿真或算法对比后，结果会直接显示在当前页面，刷新页面后不会保留。</p>
+      <div class="button-row">
+        <RouterLink class="button" to="/simulations">运行单个算法</RouterLink>
+        <RouterLink class="button secondary" to="/compare">对比多个算法</RouterLink>
+      </div>
     </section>
   </section>
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 
 import MetricCard from '../components/MetricCard.vue'
 import http from '../api/http'
-import { listMachines } from '../api/machines'
-import { getLatestSimulation } from '../api/simulations'
-import { listTasks } from '../api/tasks'
-
-const EChartPanel = defineAsyncComponent(() => import('../components/EChartPanel.vue'))
+import { deleteAllMachines, importSampleMachines, listMachines } from '../api/machines'
+import { deleteAllTasks, importSampleTasks, listTasks } from '../api/tasks'
 
 const healthStatus = ref('检查中')
 const machineCount = ref(0)
 const taskCount = ref(0)
-const lastSimulationLabel = ref('暂无')
-const latestSimulation = ref(null)
+const selectedDataset = ref('default')
+const importMessage = ref('')
+const importError = ref('')
+const isImporting = ref(false)
+const clearMessage = ref('')
+const clearError = ref('')
+const isClearing = ref(false)
 
-const resourceOption = computed(() => {
-  const history = latestSimulation.value?.resource_history || []
-  const times = history.map((item) => item.time)
-  const cpu = history.map((item) => {
-    if (item.machines.length === 0) {
-      return 0
-    }
-
-    const sum = item.machines.reduce((total, machine) => total + machine.cpu_utilization, 0)
-    return Number((sum / item.machines.length).toFixed(3))
-  })
-  const memory = history.map((item) => {
-    if (item.machines.length === 0) {
-      return 0
-    }
-
-    const sum = item.machines.reduce((total, machine) => total + machine.memory_utilization, 0)
-    return Number((sum / item.machines.length).toFixed(3))
-  })
-
-  return {
-    tooltip: { trigger: 'axis' },
-    legend: { textStyle: { color: '#dcecff' } },
-    grid: { left: 40, right: 20, top: 40, bottom: 30 },
-    xAxis: {
-      type: 'category',
-      data: times,
-      axisLabel: { color: '#9ab6d3' },
-    },
-    yAxis: {
-      type: 'value',
-      min: 0,
-      max: 1,
-      axisLabel: { color: '#9ab6d3' },
-      splitLine: { lineStyle: { color: 'rgba(173, 214, 255, 0.08)' } },
-    },
-    series: [
-      {
-        name: '平均 CPU 利用率',
-        type: 'line',
-        smooth: true,
-        data: cpu,
-      },
-      {
-        name: '平均内存利用率',
-        type: 'line',
-        smooth: true,
-        data: memory,
-      },
-    ],
-  }
-})
-
-const timelineOption = computed(() => {
-  const timeline = latestSimulation.value?.timeline || []
-
-  return {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'shadow' },
-    },
-    grid: { left: 40, right: 20, top: 30, bottom: 60 },
-    xAxis: {
-      type: 'category',
-      data: timeline.map((item) => item.task_name),
-      axisLabel: { color: '#9ab6d3', interval: 0, rotate: 20 },
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: { color: '#9ab6d3' },
-      splitLine: { lineStyle: { color: 'rgba(173, 214, 255, 0.08)' } },
-    },
-    series: [
-      {
-        name: '开始时间',
-        type: 'bar',
-        stack: 'timeline',
-        itemStyle: { color: 'rgba(0,0,0,0)' },
-        emphasis: { disabled: true },
-        data: timeline.map((item) => item.start_time),
-      },
-      {
-        name: '持续时间',
-        type: 'bar',
-        stack: 'timeline',
-        label: {
-          show: true,
-          position: 'inside',
-          formatter: ({ dataIndex }) => timeline[dataIndex]?.machine_name || '',
-        },
-        data: timeline.map((item) => item.finish_time - item.start_time),
-      },
-    ],
-  }
-})
+const datasetInfo = {
+  default: {
+    title: '默认示例',
+    description: '适合快速演示完整流程，资源规模和任务数量都比较适中。',
+  },
+  balanced: {
+    title: '均衡测试集',
+    description: '机器规格与任务需求更均衡，适合观察不同算法的分配差异。',
+  },
+  stress: {
+    title: '压力测试集',
+    description: '任务负载更集中、资源压力更高，适合观察高负载场景下的调度表现。',
+  },
+  fragmented: {
+    title: '碎片化测试集',
+    description: 'CPU 型、内存型和均衡型资源交错，适合观察 best fit / worst fit 对资源碎片的影响。',
+  },
+  priority: {
+    title: '优先级测试集',
+    description: '长任务和高优先级短任务同时竞争，适合观察 CFS Like 对等待时间的影响。',
+  },
+  deadline: {
+    title: '截止期测试集',
+    description: '多任务带有紧迫截止期，适合观察截止期违约率与任务周转表现。',
+  },
+  burst: {
+    title: '突发流量测试集',
+    description: '任务按波次集中提交，适合观察突发负载下的排队和资源均衡能力。',
+  },
+}
 
 onMounted(async () => {
+  await refreshOverview()
+})
+
+async function refreshOverview() {
   try {
     const [health, machines, tasks] = await Promise.all([
       http.get('/health'),
@@ -170,18 +133,43 @@ onMounted(async () => {
   } catch {
     healthStatus.value = '不可用'
   }
+}
+
+async function handleImportDataset() {
+  importMessage.value = ''
+  importError.value = ''
+  isImporting.value = true
 
   try {
-    const simulation = await getLatestSimulation()
-    latestSimulation.value = simulation.data
-    lastSimulationLabel.value = `#${simulation.data.id} · ${simulation.data.algorithm}`
+    const [machines, tasks] = await Promise.all([
+      importSampleMachines(selectedDataset.value),
+      importSampleTasks(selectedDataset.value),
+    ])
+    machineCount.value = machines.data.length
+    taskCount.value = tasks.data.length
+    importMessage.value = `已导入 ${machines.data.length} 台物理机和 ${tasks.data.length} 个任务。`
   } catch (error) {
-    if (error.response?.status === 404) {
-      lastSimulationLabel.value = '暂无'
-      return
-    }
-
-    lastSimulationLabel.value = '读取失败'
+    importError.value = error.response?.data?.detail || '测试集导入失败，请检查后端服务。'
+  } finally {
+    isImporting.value = false
   }
-})
+}
+
+async function handleClearAll() {
+  clearMessage.value = ''
+  clearError.value = ''
+  isClearing.value = true
+
+  try {
+    const [machineResult, taskResult] = await Promise.all([deleteAllMachines(), deleteAllTasks()])
+    machineCount.value = 0
+    taskCount.value = 0
+    clearMessage.value = `已清空机器 ${machineResult.data.deleted_count} 台，任务 ${taskResult.data.deleted_count} 个。`
+  } catch (error) {
+    clearError.value = error.response?.data?.detail || '清空失败，请检查后端服务。'
+  } finally {
+    isClearing.value = false
+    await refreshOverview()
+  }
+}
 </script>

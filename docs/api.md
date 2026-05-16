@@ -12,6 +12,7 @@
 - 后端默认运行地址：`http://127.0.0.1:8000`
 - 前端开发环境通过 Vite 代理访问 `/api`
 - 当前响应格式以 JSON 为主
+- CPU 数值单位为“核”，内存数值单位为“MB”
 - 如果请求的资源不存在，接口通常返回 `404`
 - 如果请求参数非法或算法名不支持，接口可能返回 `400`
 
@@ -29,7 +30,7 @@
     "id": 1,
     "name": "node-a",
     "total_cpu": 4,
-    "total_memory": 8,
+    "total_memory": 8192,
     "enabled": true
   }
 ]
@@ -45,7 +46,7 @@
 {
   "name": "node-a",
   "total_cpu": 4,
-  "total_memory": 8,
+  "total_memory": 8192,
   "enabled": true
 }
 ```
@@ -57,7 +58,7 @@
   "id": 1,
   "name": "node-a",
   "total_cpu": 4,
-  "total_memory": 8,
+  "total_memory": 8192,
   "enabled": true
 }
 ```
@@ -72,7 +73,7 @@
 {
   "name": "node-a-updated",
   "total_cpu": 6,
-  "total_memory": 12,
+  "total_memory": 12288,
   "enabled": false
 }
 ```
@@ -84,7 +85,7 @@
   "id": 1,
   "name": "node-a-updated",
   "total_cpu": 6,
-  "total_memory": 12,
+  "total_memory": 12288,
   "enabled": false
 }
 ```
@@ -108,13 +109,13 @@
   {
     "name": "node-a",
     "total_cpu": 4,
-    "total_memory": 8,
+    "total_memory": 8192,
     "enabled": true
   },
   {
     "name": "node-b",
     "total_cpu": 6,
-    "total_memory": 12,
+    "total_memory": 12288,
     "enabled": true
   }
 ]
@@ -122,7 +123,7 @@
 
 ### `POST /api/machines/import-sample`
 
-从 `data/sample_machines.json` 导入示例物理机数据。
+从 `data/` 中导入示例物理机数据。导入前会先清空当前已有物理机，因此该接口是覆盖式导入。
 
 这个接口不需要请求体。
 
@@ -130,6 +131,10 @@
 - `dataset=default`
 - `dataset=balanced`
 - `dataset=stress`
+- `dataset=fragmented`
+- `dataset=priority`
+- `dataset=deadline`
+- `dataset=burst`
 
 响应示例：
 
@@ -139,17 +144,29 @@
     "id": 1,
     "name": "node-a",
     "total_cpu": 4,
-    "total_memory": 8,
+    "total_memory": 8192,
     "enabled": true
   },
   {
     "id": 2,
     "name": "node-b",
     "total_cpu": 6,
-    "total_memory": 12,
+    "total_memory": 12288,
     "enabled": true
   }
 ]
+```
+
+### `DELETE /api/machines`
+
+清空当前所有物理机配置。
+
+成功响应：
+
+```json
+{
+  "deleted_count": 4
+}
 ```
 
 ### `DELETE /api/machines/{id}`
@@ -186,7 +203,7 @@
     "id": 1,
     "name": "task-1",
     "required_cpu": 2,
-    "required_memory": 4,
+    "required_memory": 4096,
     "duration": 5,
     "submit_time": 0,
     "priority": 1,
@@ -205,7 +222,7 @@
 {
   "name": "task-1",
   "required_cpu": 2,
-  "required_memory": 4,
+  "required_memory": 4096,
   "duration": 5,
   "submit_time": 0,
   "priority": 1,
@@ -220,7 +237,7 @@
   "id": 1,
   "name": "task-1",
   "required_cpu": 2,
-  "required_memory": 4,
+  "required_memory": 4096,
   "duration": 5,
   "submit_time": 0,
   "priority": 1,
@@ -238,7 +255,7 @@
 {
   "name": "task-1-updated",
   "required_cpu": 3,
-  "required_memory": 6,
+  "required_memory": 6144,
   "duration": 7,
   "submit_time": 1,
   "priority": 2,
@@ -253,7 +270,7 @@
   "id": 1,
   "name": "task-1-updated",
   "required_cpu": 3,
-  "required_memory": 6,
+  "required_memory": 6144,
   "duration": 7,
   "submit_time": 1,
   "priority": 2,
@@ -281,7 +298,7 @@
 
 ### `POST /api/tasks/import-sample`
 
-从 `data/sample_tasks.json` 导入示例任务数据。
+从 `data/` 中导入示例任务数据。导入前会先清空当前已有任务，因此该接口是覆盖式导入。
 
 这个接口不需要请求体。
 
@@ -289,6 +306,10 @@
 - `dataset=default`
 - `dataset=balanced`
 - `dataset=stress`
+- `dataset=fragmented`
+- `dataset=priority`
+- `dataset=deadline`
+- `dataset=burst`
 
 响应示例：
 
@@ -298,13 +319,25 @@
     "id": 1,
     "name": "task-1",
     "required_cpu": 2,
-    "required_memory": 4,
+    "required_memory": 4096,
     "duration": 5,
     "submit_time": 0,
     "priority": 1,
     "deadline": 12
   }
 ]
+```
+
+### `DELETE /api/tasks`
+
+清空当前所有任务配置。
+
+成功响应：
+
+```json
+{
+  "deleted_count": 8
+}
 ```
 
 ### `DELETE /api/tasks/{id}`
@@ -343,17 +376,16 @@
 ```
 
 响应说明：
-- 返回新生成的仿真记录 ID
 - 返回本次仿真的算法名
 - 返回完整时间线 `timeline`
 - 返回资源历史 `resource_history`
 - 返回指标 `metrics`
+- 仿真结果不写入数据库历史记录
 
 响应示例：
 
 ```json
 {
-  "id": 1,
   "algorithm": "first_fit",
   "timeline": [
     {
@@ -369,7 +401,13 @@
     "success_rate": 1.0,
     "rejection_rate": 0.0,
     "makespan": 5,
-    "average_waiting_time": 0.0
+    "average_waiting_time": 0.0,
+    "max_waiting_time": 0,
+    "average_turnaround_time": 5.0,
+    "deadline_miss_rate": 0.0,
+    "load_balance_score": 0.0,
+    "average_cpu_load_balance_score": 0.0,
+    "average_memory_load_balance_score": 0.0
   }
 }
 ```
@@ -382,65 +420,59 @@
 }
 ```
 
-### `GET /api/simulations/latest`
+### `POST /api/simulations/compare`
 
-返回最近一次仿真的完整结果。
+使用当前数据库中的物理机和任务配置，对多个算法分别运行仿真并返回对比结果。
 
-返回内容包含：
-- `id`
-- `algorithm`
-- `max_time`
-- `timeline`
-- `resource_history`
-- `metrics`
-
-如果当前还没有任何仿真记录，返回：
+请求示例：
 
 ```json
 {
-  "detail": "Simulation not found"
+  "algorithms": ["first_fit", "least_loaded", "cfs_like"],
+  "max_time": 20
 }
 ```
-
-### `GET /api/simulations/{id}`
-
-返回某次仿真的基础元数据。
 
 响应示例：
 
 ```json
 {
-  "id": 1,
-  "algorithm": "first_fit",
-  "max_time": 20
+  "max_time": 20,
+  "algorithms": ["first_fit", "least_loaded", "cfs_like"],
+  "results": [
+    {
+      "algorithm": "first_fit",
+      "timeline": [],
+      "resource_history": [],
+      "metrics": {
+        "success_rate": 1.0,
+        "rejection_rate": 0.0,
+        "makespan": 5,
+        "average_waiting_time": 0.0,
+        "max_waiting_time": 0,
+        "deadline_miss_rate": 0.0,
+        "average_cpu_load_balance_score": 0.0,
+        "average_memory_load_balance_score": 0.0
+      }
+    }
+  ]
 }
 ```
 
-### `GET /api/simulations/{id}/results`
+常用指标含义：
 
-返回某次仿真的详细结果：
-- `timeline`
-- `resource_history`
+- `average_waiting_time`：完成任务的平均等待时间。
+- `max_waiting_time`：完成任务中的最长等待时间。
+- `deadline_miss_rate`：设置了截止期的任务中，完成时间超过截止期的比例。
+- `load_balance_score`：仿真结束时各机器 CPU 利用率方差。
+- `average_cpu_load_balance_score`：所有时间片的 CPU 利用率方差平均值，越低表示过程越均衡。
+- `average_memory_load_balance_score`：所有时间片的内存利用率方差平均值，越低表示过程越均衡。
 
-### `GET /api/simulations/{id}/metrics`
-
-返回某次仿真的最终指标。
-
-常见字段包括：
-- `average_cpu_utilization`
-- `average_memory_utilization`
-- `average_waiting_time`
-- `average_turnaround_time`
-- `success_rate`
-- `rejection_rate`
-- `makespan`
-- `load_balance_score`
-
-如果仿真 `id` 不存在，上述三个查询接口都会返回：
+如果算法不支持，返回类似：
 
 ```json
 {
-  "detail": "Simulation not found"
+  "detail": "Unsupported scheduler: unknown_algorithm"
 }
 ```
 

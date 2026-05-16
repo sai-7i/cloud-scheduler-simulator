@@ -1,0 +1,14 @@
+[
+  {
+    "name": "priority-a",
+    "total_cpu": 4,
+    "total_memory": 8192,
+    "enabled": true
+  },
+  {
+    "name": "priority-b",
+    "total_cpu": 4,
+    "total_memory": 8192,
+    "enabled": true
+  }
+]

@@ -3,10 +3,10 @@ from app.simulation.engine import run_simulation
 
 
 def test_run_simulation_allocates_waiting_task_after_resources_release() -> None:
-    machines = [Machine(id=1, name="node-a", total_cpu=4, total_memory=8)]
+    machines = [Machine(id=1, name="node-a", total_cpu=4, total_memory=8192)]
     tasks = [
-        Task(id=1, name="first", required_cpu=4, required_memory=8, duration=2, submit_time=0),
-        Task(id=2, name="second", required_cpu=4, required_memory=8, duration=2, submit_time=0),
+        Task(id=1, name="first", required_cpu=4, required_memory=8192, duration=2, submit_time=0),
+        Task(id=2, name="second", required_cpu=4, required_memory=8192, duration=2, submit_time=0),
     ]
 
     result = run_simulation(machines, tasks, algorithm="first_fit", max_time=10)
@@ -35,8 +35,8 @@ def test_run_simulation_allocates_waiting_task_after_resources_release() -> None
 
 
 def test_run_simulation_rejects_tasks_left_after_max_time() -> None:
-    machines = [Machine(id=1, name="node-a", total_cpu=2, total_memory=4)]
-    tasks = [Task(id=1, name="too-large", required_cpu=4, required_memory=8, duration=1, submit_time=0)]
+    machines = [Machine(id=1, name="node-a", total_cpu=2, total_memory=4096)]
+    tasks = [Task(id=1, name="too-large", required_cpu=4, required_memory=8192, duration=1, submit_time=0)]
 
     result = run_simulation(machines, tasks, algorithm="first_fit", max_time=1)
 
@@ -47,13 +47,13 @@ def test_run_simulation_rejects_tasks_left_after_max_time() -> None:
 
 
 def test_cfs_like_runs_lower_virtual_runtime_task_first() -> None:
-    machines = [Machine(id=1, name="node-a", total_cpu=4, total_memory=8)]
+    machines = [Machine(id=1, name="node-a", total_cpu=4, total_memory=8192)]
     tasks = [
         Task(
             id=1,
             name="long-low-priority",
             required_cpu=4,
-            required_memory=8,
+            required_memory=8192,
             duration=6,
             submit_time=0,
             priority=0,
@@ -62,7 +62,7 @@ def test_cfs_like_runs_lower_virtual_runtime_task_first() -> None:
             id=2,
             name="short-high-priority",
             required_cpu=4,
-            required_memory=8,
+            required_memory=8192,
             duration=2,
             submit_time=0,
             priority=3,
@@ -80,10 +80,10 @@ def test_cfs_like_runs_lower_virtual_runtime_task_first() -> None:
 
 def test_least_loaded_uses_lower_load_machine_when_multiple_can_fit() -> None:
     machines = [
-        Machine(id=1, name="busy", total_cpu=4, total_memory=8, used_cpu=2, used_memory=4),
-        Machine(id=2, name="light", total_cpu=4, total_memory=8),
+        Machine(id=1, name="busy", total_cpu=4, total_memory=8192, used_cpu=2, used_memory=4096),
+        Machine(id=2, name="light", total_cpu=4, total_memory=8192),
     ]
-    tasks = [Task(id=1, name="task-1", required_cpu=2, required_memory=4, duration=2, submit_time=0)]
+    tasks = [Task(id=1, name="task-1", required_cpu=2, required_memory=4096, duration=2, submit_time=0)]
 
     result = run_simulation(machines, tasks, algorithm="least_loaded", max_time=5)
 

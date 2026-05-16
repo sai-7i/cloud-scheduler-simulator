@@ -12,10 +12,17 @@
             <option value="default">默认示例</option>
             <option value="balanced">均衡测试集</option>
             <option value="stress">压力测试集</option>
+            <option value="fragmented">碎片化测试集</option>
+            <option value="priority">优先级测试集</option>
+            <option value="deadline">截止期测试集</option>
+            <option value="burst">突发流量测试集</option>
           </select>
         </label>
         <button class="button secondary" type="button" @click="handleImportSample">导入测试集</button>
         <button class="button secondary" type="button" @click="handleGenerate">生成演示任务</button>
+        <button class="button danger" type="button" :disabled="isClearing" @click="handleClearAll">
+          {{ isClearing ? '清空中...' : '清空任务' }}
+        </button>
         <button class="button" type="button" @click="loadTasks">刷新</button>
       </div>
     </header>
@@ -34,11 +41,11 @@
           <input v-model="form.name" type="text" placeholder="例如：task-1" required />
         </label>
         <label class="field">
-          <span>CPU 需求</span>
+          <span>CPU 需求（核）</span>
           <input v-model.number="form.required_cpu" type="number" min="1" required />
         </label>
         <label class="field">
-          <span>内存需求</span>
+          <span>内存需求（MB）</span>
           <input v-model.number="form.required_memory" type="number" min="1" required />
         </label>
         <label class="field">
@@ -82,8 +89,8 @@
         <thead>
           <tr>
             <th>名称</th>
-            <th>CPU</th>
-            <th>内存</th>
+            <th>CPU（核）</th>
+            <th>内存（MB）</th>
             <th>持续时间</th>
             <th>提交时间</th>
             <th>优先级</th>
@@ -121,12 +128,13 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
-import { createTask, deleteTask, generateTasks, importSampleTasks, listTasks, updateTask } from '../api/tasks'
+import { createTask, deleteAllTasks, deleteTask, generateTasks, importSampleTasks, listTasks, updateTask } from '../api/tasks'
 
 const tasks = ref([])
 const message = ref('')
 const editingTaskId = ref(null)
 const selectedDataset = ref('default')
+const isClearing = ref(false)
 
 const datasetInfo = {
   default: {
@@ -141,13 +149,29 @@ const datasetInfo = {
     title: '压力测试集',
     description: '任务更密集、资源压力更高，适合观察算法在高负载下的表现。',
   },
+  fragmented: {
+    title: '碎片化测试集',
+    description: 'CPU 密集、内存密集和均衡任务混合，适合观察资源碎片导致的等待差异。',
+  },
+  priority: {
+    title: '优先级测试集',
+    description: '长任务与高优先级短任务同批提交，适合突出 CFS Like 的队列排序差异。',
+  },
+  deadline: {
+    title: '截止期测试集',
+    description: '包含多个紧截止期任务，适合观察 deadline miss rate。',
+  },
+  burst: {
+    title: '突发流量测试集',
+    description: '任务按多个时间点集中到达，适合观察排队峰值和负载均衡。',
+  },
 }
 
 function createInitialForm() {
   return {
     name: '',
     required_cpu: 2,
-    required_memory: 4,
+    required_memory: 4096,
     duration: 5,
     submit_time: 0,
     priority: 0,
@@ -217,6 +241,24 @@ async function handleImportSample() {
   await importSampleTasks(selectedDataset.value)
   message.value = `任务测试集已导入：${selectedDataset.value}`
   await loadTasks()
+}
+
+async function handleClearAll() {
+  isClearing.value = true
+
+  try {
+    const response = await deleteAllTasks()
+    message.value = `已清空 ${response.data.deleted_count} 个任务。`
+
+    if (editingTaskId.value !== null) {
+      editingTaskId.value = null
+      resetForm()
+    }
+
+    await loadTasks()
+  } finally {
+    isClearing.value = false
+  }
 }
 
 async function handleDelete(id) {

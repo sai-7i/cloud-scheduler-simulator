@@ -1,14 +1,20 @@
 [
   {
-    "name": "stress-a",
-    "total_cpu": 2,
-    "total_memory": 4,
+    "name": "stress-cpu-small",
+    "total_cpu": 6,
+    "total_memory": 5120,
     "enabled": true
   },
   {
-    "name": "stress-b",
+    "name": "stress-memory-small",
     "total_cpu": 3,
-    "total_memory": 6,
+    "total_memory": 12288,
+    "enabled": true
+  },
+  {
+    "name": "stress-general-small",
+    "total_cpu": 4,
+    "total_memory": 7168,
     "enabled": true
   }
 ]

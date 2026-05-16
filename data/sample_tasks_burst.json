@@ -1,0 +1,74 @@
+[
+  {
+    "name": "burst-wave1-1",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 5,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 8
+  },
+  {
+    "name": "burst-wave1-2",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 5,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 8
+  },
+  {
+    "name": "burst-wave1-3",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 5,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 8
+  },
+  {
+    "name": "burst-wave2-1",
+    "required_cpu": 2,
+    "required_memory": 3072,
+    "duration": 4,
+    "submit_time": 3,
+    "priority": 2,
+    "deadline": 9
+  },
+  {
+    "name": "burst-wave2-2",
+    "required_cpu": 2,
+    "required_memory": 3072,
+    "duration": 4,
+    "submit_time": 3,
+    "priority": 2,
+    "deadline": 9
+  },
+  {
+    "name": "burst-wave2-3",
+    "required_cpu": 2,
+    "required_memory": 3072,
+    "duration": 4,
+    "submit_time": 3,
+    "priority": 2,
+    "deadline": 9
+  },
+  {
+    "name": "burst-wave3-large",
+    "required_cpu": 5,
+    "required_memory": 7168,
+    "duration": 6,
+    "submit_time": 6,
+    "priority": 1,
+    "deadline": 15
+  },
+  {
+    "name": "burst-wave3-small",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 2,
+    "submit_time": 6,
+    "priority": 3,
+    "deadline": 9
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "name": "frag-cpu-large",
+    "required_cpu": 7,
+    "required_memory": 3072,
+    "duration": 8,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 12
+  },
+  {
+    "name": "frag-memory-large",
+    "required_cpu": 2,
+    "required_memory": 12288,
+    "duration": 7,
+    "submit_time": 0,
+    "priority": 1,
+    "deadline": 11
+  },
+  {
+    "name": "frag-balanced-large",
+    "required_cpu": 5,
+    "required_memory": 9216,
+    "duration": 6,
+    "submit_time": 1,
+    "priority": 1,
+    "deadline": 10
+  },
+  {
+    "name": "frag-cpu-medium",
+    "required_cpu": 5,
+    "required_memory": 2048,
+    "duration": 4,
+    "submit_time": 2,
+    "priority": 0,
+    "deadline": 9
+  },
+  {
+    "name": "frag-memory-medium",
+    "required_cpu": 1,
+    "required_memory": 8192,
+    "duration": 4,
+    "submit_time": 2,
+    "priority": 0,
+    "deadline": 9
+  },
+  {
+    "name": "frag-small-1",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 3,
+    "submit_time": 3,
+    "priority": 2,
+    "deadline": 7
+  },
+  {
+    "name": "frag-small-2",
+    "required_cpu": 2,
+    "required_memory": 2048,
+    "duration": 3,
+    "submit_time": 3,
+    "priority": 2,
+    "deadline": 7
+  }
+]

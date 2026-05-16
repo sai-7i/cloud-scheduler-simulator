@@ -1,20 +1,26 @@
 [
   {
-    "name": "node-a",
+    "name": "cpu-heavy-node",
+    "total_cpu": 10,
+    "total_memory": 8192,
+    "enabled": true
+  },
+  {
+    "name": "memory-heavy-node",
     "total_cpu": 4,
-    "total_memory": 8,
+    "total_memory": 20480,
     "enabled": true
   },
   {
-    "name": "node-b",
+    "name": "balanced-node",
     "total_cpu": 6,
-    "total_memory": 12,
+    "total_memory": 12288,
     "enabled": true
   },
   {
-    "name": "node-c",
-    "total_cpu": 8,
-    "total_memory": 16,
+    "name": "edge-node",
+    "total_cpu": 3,
+    "total_memory": 6144,
     "enabled": true
   }
 ]

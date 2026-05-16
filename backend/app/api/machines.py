@@ -34,7 +34,14 @@ def create_machines(payload: list[MachineCreate]) -> list[MachineRead]:
 @router.post("/import-sample", response_model=list[MachineRead])
 def import_sample_machines(dataset: str = "default") -> list[MachineRead]:
     samples = load_sample_records("machines", dataset)
+    store.delete_all_machines()
     return [store.create_machine(MachineCreate(**machine)) for machine in samples]
+
+
+@router.delete("")
+def delete_all_machines() -> dict[str, int]:
+    deleted_count = store.delete_all_machines()
+    return {"deleted_count": deleted_count}
 
 
 @router.delete("/{machine_id}")

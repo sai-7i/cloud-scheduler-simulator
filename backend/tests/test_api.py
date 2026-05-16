@@ -8,21 +8,21 @@ def test_update_machine_persists_changes() -> None:
 
     created = client.post(
         "/api/machines",
-        json={"name": "node-a", "total_cpu": 4, "total_memory": 8, "enabled": True},
+        json={"name": "node-a", "total_cpu": 4, "total_memory": 8192, "enabled": True},
     )
     assert created.status_code == 200
     machine_id = created.json()["id"]
 
     updated = client.put(
         f"/api/machines/{machine_id}",
-        json={"name": "node-a-updated", "total_cpu": 6, "total_memory": 12, "enabled": False},
+        json={"name": "node-a-updated", "total_cpu": 6, "total_memory": 12288, "enabled": False},
     )
     assert updated.status_code == 200
     assert updated.json() == {
         "id": machine_id,
         "name": "node-a-updated",
         "total_cpu": 6,
-        "total_memory": 12,
+        "total_memory": 12288,
         "enabled": False,
     }
 
@@ -39,7 +39,7 @@ def test_update_task_persists_changes() -> None:
         json={
             "name": "task-a",
             "required_cpu": 2,
-            "required_memory": 4,
+            "required_memory": 4096,
             "duration": 5,
             "submit_time": 0,
             "priority": 0,
@@ -54,7 +54,7 @@ def test_update_task_persists_changes() -> None:
         json={
             "name": "task-a-updated",
             "required_cpu": 3,
-            "required_memory": 6,
+            "required_memory": 6144,
             "duration": 7,
             "submit_time": 1,
             "priority": 2,
@@ -66,7 +66,7 @@ def test_update_task_persists_changes() -> None:
         "id": task_id,
         "name": "task-a-updated",
         "required_cpu": 3,
-        "required_memory": 6,
+        "required_memory": 6144,
         "duration": 7,
         "submit_time": 1,
         "priority": 2,
@@ -83,7 +83,7 @@ def test_update_missing_machine_returns_404() -> None:
 
     response = client.put(
         "/api/machines/999",
-        json={"name": "missing", "total_cpu": 4, "total_memory": 8, "enabled": True},
+        json={"name": "missing", "total_cpu": 4, "total_memory": 8192, "enabled": True},
     )
 
     assert response.status_code == 404
@@ -98,7 +98,7 @@ def test_update_missing_task_returns_404() -> None:
         json={
             "name": "missing",
             "required_cpu": 1,
-            "required_memory": 2,
+            "required_memory": 2048,
             "duration": 3,
             "submit_time": 0,
             "priority": 0,
@@ -116,8 +116,8 @@ def test_generated_tasks_work_with_demo_sized_machines() -> None:
     response = client.post(
         "/api/machines/batch",
         json=[
-            {"name": "node-a", "total_cpu": 4, "total_memory": 8, "enabled": True},
-            {"name": "node-b", "total_cpu": 6, "total_memory": 12, "enabled": True},
+            {"name": "node-a", "total_cpu": 4, "total_memory": 8192, "enabled": True},
+            {"name": "node-b", "total_cpu": 6, "total_memory": 12288, "enabled": True},
         ],
     )
     assert response.status_code == 200
@@ -125,7 +125,7 @@ def test_generated_tasks_work_with_demo_sized_machines() -> None:
     generated = client.post("/api/tasks/generate")
     assert generated.status_code == 200
     generated_tasks = generated.json()
-    assert [task["required_memory"] for task in generated_tasks] == [4, 6, 2]
+    assert [task["required_memory"] for task in generated_tasks] == [4096, 6144, 2048]
 
     simulation = client.post(
         "/api/simulations/run",
@@ -138,67 +138,126 @@ def test_generated_tasks_work_with_demo_sized_machines() -> None:
     assert metrics["rejection_rate"] == 0
 
 
-def test_get_latest_simulation_returns_newest_result() -> None:
+def test_run_simulation_returns_result_without_saving_history_id() -> None:
     client = TestClient(app)
 
     client.post(
         "/api/machines/batch",
         json=[
-            {"name": "node-a", "total_cpu": 4, "total_memory": 8, "enabled": True},
-            {"name": "node-b", "total_cpu": 6, "total_memory": 12, "enabled": True},
+            {"name": "node-a", "total_cpu": 4, "total_memory": 8192, "enabled": True},
+            {"name": "node-b", "total_cpu": 6, "total_memory": 12288, "enabled": True},
         ],
     )
     client.post("/api/tasks/generate")
 
-    first = client.post(
+    response = client.post(
         "/api/simulations/run",
         json={"algorithm": "first_fit", "max_time": 20},
     )
-    second = client.post(
-        "/api/simulations/run",
-        json={"algorithm": "round_robin", "max_time": 30},
-    )
 
-    assert first.status_code == 200
-    assert second.status_code == 200
-
-    latest = client.get("/api/simulations/latest")
-    assert latest.status_code == 200
-    assert latest.json()["id"] == second.json()["id"]
-    assert latest.json()["algorithm"] == "round_robin"
-    assert latest.json()["max_time"] == 30
-    assert "metrics" in latest.json()
-    assert "timeline" in latest.json()
-    assert "resource_history" in latest.json()
+    assert response.status_code == 200
+    assert response.json()["algorithm"] == "first_fit"
+    assert "id" not in response.json()
+    assert "timeline" in response.json()
+    assert "resource_history" in response.json()
+    assert "metrics" in response.json()
 
 
-def test_get_latest_simulation_returns_404_when_empty() -> None:
+def test_compare_simulations_returns_results() -> None:
     client = TestClient(app)
 
-    response = client.get("/api/simulations/latest")
+    client.post(
+        "/api/machines/batch",
+        json=[
+            {"name": "node-a", "total_cpu": 4, "total_memory": 8192, "enabled": True},
+            {"name": "node-b", "total_cpu": 6, "total_memory": 12288, "enabled": True},
+        ],
+    )
+    client.post("/api/tasks/generate")
 
-    assert response.status_code == 404
-    assert response.json()["detail"] == "Simulation not found"
+    response = client.post(
+        "/api/simulations/compare",
+        json={"algorithms": ["first_fit", "least_loaded"], "max_time": 20},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["max_time"] == 20
+    assert body["algorithms"] == ["first_fit", "least_loaded"]
+    assert [result["algorithm"] for result in body["results"]] == ["first_fit", "least_loaded"]
+    assert all(result["metrics"]["success_rate"] == 1 for result in body["results"])
+
+
+def test_compare_simulations_rejects_unknown_algorithm() -> None:
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/simulations/compare",
+        json={"algorithms": ["missing"], "max_time": 20},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Unsupported scheduler: missing"
 
 
 def test_import_sample_machines_creates_records() -> None:
     client = TestClient(app)
+    created = client.post(
+        "/api/machines",
+        json={"name": "old-node", "total_cpu": 1, "total_memory": 1024, "enabled": True},
+    )
+    assert created.status_code == 200
 
     response = client.post("/api/machines/import-sample")
 
     assert response.status_code == 200
-    assert len(response.json()) == 3
-    assert response.json()[0]["name"] == "node-a"
+    assert len(response.json()) == 4
+    assert response.json()[0]["name"] == "cpu-heavy-node"
+    assert "old-node" not in [machine["name"] for machine in response.json()]
 
 
 def test_import_sample_tasks_creates_records() -> None:
     client = TestClient(app)
+    created = client.post(
+        "/api/tasks",
+        json={
+            "name": "old-task",
+            "required_cpu": 1,
+            "required_memory": 1024,
+            "duration": 1,
+            "submit_time": 0,
+        },
+    )
+    assert created.status_code == 200
 
     response = client.post("/api/tasks/import-sample")
 
     assert response.status_code == 200
-    assert len(response.json()) == 5
-    assert response.json()[0]["name"] == "task-1"
+    assert len(response.json()) == 8
+    assert response.json()[0]["name"] == "cpu-batch-large"
+    assert "old-task" not in [task["name"] for task in response.json()]
+
+
+def test_delete_all_machines_removes_records() -> None:
+    client = TestClient(app)
+    client.post("/api/machines/import-sample")
+
+    response = client.delete("/api/machines")
+
+    assert response.status_code == 200
+    assert response.json() == {"deleted_count": 4}
+    assert client.get("/api/machines").json() == []
+
+
+def test_delete_all_tasks_removes_records() -> None:
+    client = TestClient(app)
+    client.post("/api/tasks/import-sample")
+
+    response = client.delete("/api/tasks")
+
+    assert response.status_code == 200
+    assert response.json() == {"deleted_count": 8}
+    assert client.get("/api/tasks").json() == []
 
 
 def test_import_balanced_machine_dataset_creates_balanced_records() -> None:
@@ -207,7 +266,12 @@ def test_import_balanced_machine_dataset_creates_balanced_records() -> None:
     response = client.post("/api/machines/import-sample?dataset=balanced")
 
     assert response.status_code == 200
-    assert [machine["name"] for machine in response.json()] == ["balanced-a", "balanced-b", "balanced-c"]
+    assert [machine["name"] for machine in response.json()] == [
+        "balanced-a",
+        "balanced-b",
+        "balanced-c",
+        "balanced-d",
+    ]
 
 
 def test_import_stress_task_dataset_creates_stress_records() -> None:
@@ -217,12 +281,29 @@ def test_import_stress_task_dataset_creates_stress_records() -> None:
 
     assert response.status_code == 200
     assert [task["name"] for task in response.json()] == [
-        "stress-task-1",
-        "stress-task-2",
-        "stress-task-3",
-        "stress-task-4",
-        "stress-task-5",
+        "stress-cpu-blocker",
+        "stress-memory-blocker",
+        "stress-balanced-blocker",
+        "stress-urgent-small-1",
+        "stress-urgent-small-2",
+        "stress-cpu-late",
+        "stress-memory-late",
+        "stress-oversized-rejected",
     ]
+
+
+def test_import_all_named_sample_datasets() -> None:
+    client = TestClient(app)
+    datasets = ["default", "balanced", "stress", "fragmented", "priority", "deadline", "burst"]
+
+    for dataset in datasets:
+        machines = client.post(f"/api/machines/import-sample?dataset={dataset}")
+        tasks = client.post(f"/api/tasks/import-sample?dataset={dataset}")
+
+        assert machines.status_code == 200
+        assert tasks.status_code == 200
+        assert len(machines.json()) > 0
+        assert len(tasks.json()) > 0
 
 
 def test_import_missing_sample_dataset_returns_404() -> None:

@@ -2,7 +2,7 @@
 
 一个面向教学、课程演示和调度算法实验的小型云数据中心资源调度模拟器。
 
-第一版聚焦 CPU 和内存两个资源维度，提供物理机配置、任务配置、调度算法选择、离散时间仿真、指标统计和图表展示能力。项目采用前后端分离结构，后端使用 FastAPI，前端使用 Vue 3，数据持久化使用 SQLite 和原生 SQL。
+第一版聚焦 CPU 和内存两个资源维度，提供物理机配置、任务配置、调度算法选择、算法对比、离散时间仿真、指标统计和图表展示能力。项目采用前后端分离结构，后端使用 FastAPI，前端使用 Vue 3，机器与任务配置使用 SQLite 和原生 SQL 持久化。
 
 ## 当前版本
 
@@ -28,16 +28,19 @@
   - 选择调度算法
   - 设置最大仿真时间
   - 运行仿真
-  - 查看最近一次仿真结果
+  - 在当前页面查看本次仿真结果
+- 算法对比
+  - 一次选择多个算法
+  - 使用同一组机器和任务横向对比指标
+  - 展示对比图表和结果表格
 - 结果分析
   - 指标卡片
   - 资源利用率趋势图
   - 任务时间线图
-  - 最近一次仿真摘要概览
 - 数据持久化
   - 机器配置持久化
   - 任务配置持久化
-  - 仿真结果持久化
+  - 仿真结果不持久化，刷新页面后不保留
 
 ## 当前支持的调度算法
 
@@ -127,13 +130,15 @@ npm run build
 5. 进入“仿真”页面，选择一种算法并设置最大仿真时间。
 6. 点击“开始运行”。
 7. 查看指标卡、资源利用率趋势图和任务时间线图。
-8. 回到“概览”页面，查看最近一次仿真摘要。
+8. 进入“算法对比”页面，选择多个算法并查看横向对比结果。
 
 你也可以手动创建机器和任务，而不使用示例数据。
 
 ## 示例数据
 
-当前仓库已包含两份示例数据：
+项目中 CPU 使用“核”作为单位，内存使用“MB”作为单位。示例数据已按 MB 级别编排，例如 4 核任务通常对应 4096 MB、8192 MB 等更合理的内存需求。
+
+当前仓库已包含默认示例数据：
 
 - `data/sample_machines.json`
 - `data/sample_tasks.json`
@@ -142,20 +147,40 @@ npm run build
 
 - `balanced`：更适合观察均衡调度行为
 - `stress`：更适合观察高压力负载下的调度差异
+- `fragmented`：更适合观察 CPU/内存资源碎片和紧凑/分散放置差异
+- `priority`：更适合观察长任务与高优先级短任务竞争时的等待差异
+- `deadline`：更适合观察截止期违约率和紧迫任务完成情况
+- `burst`：更适合观察多波次突发提交下的排队与负载均衡
+
+这些数据包含更明显的异构机器、CPU 密集型任务、内存密集型任务、短任务、长任务、不同优先级和不同截止期，用于让不同算法在等待时间、截止期违约率和负载均衡分数上产生更直观的差异。
 
 对应导入接口：
 
 - `POST /api/machines/import-sample`
 - `POST /api/tasks/import-sample`
 
+导入测试集时会先清空对应类型的已有配置，再写入所选测试集，避免多次导入导致数据叠加。
+如果需要手动清空，也可以使用：
+
+- `DELETE /api/machines`
+- `DELETE /api/tasks`
+
 可通过 `dataset` 参数手动选择测试集，例如：
 
 - `POST /api/machines/import-sample?dataset=default`
 - `POST /api/machines/import-sample?dataset=balanced`
 - `POST /api/machines/import-sample?dataset=stress`
+- `POST /api/machines/import-sample?dataset=fragmented`
+- `POST /api/machines/import-sample?dataset=priority`
+- `POST /api/machines/import-sample?dataset=deadline`
+- `POST /api/machines/import-sample?dataset=burst`
 - `POST /api/tasks/import-sample?dataset=default`
 - `POST /api/tasks/import-sample?dataset=balanced`
 - `POST /api/tasks/import-sample?dataset=stress`
+- `POST /api/tasks/import-sample?dataset=fragmented`
+- `POST /api/tasks/import-sample?dataset=priority`
+- `POST /api/tasks/import-sample?dataset=deadline`
+- `POST /api/tasks/import-sample?dataset=burst`
 
 ## 数据库说明
 
@@ -190,7 +215,7 @@ npm run build
 
 - `cfs_like` 是教学用简化实现，不是 Linux CFS 的完整复刻
 - `least_loaded` 当前使用“CPU 利用率优先、内存利用率次之”的简化负载定义
-- 仿真结果中的复杂结构当前以 JSON 字符串形式保存在 SQLite 中，便于 MVP 快速落地
+- 仿真结果只在本次 API 响应和当前前端页面中展示，不写入数据库历史记录
 
 ## 发布前验证结果
 
@@ -199,8 +224,8 @@ npm run build
 - 后端测试通过
 - 前端构建通过
 - 示例数据可导入
-- 最近一次仿真摘要可显示
 - 已支持算法可在前端运行
+- 算法对比页面可构建
 
 ## 许可证与说明
 

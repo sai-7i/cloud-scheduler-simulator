@@ -25,7 +25,7 @@
 - 新增物理机、任务、仿真三类 API。
 - 新增 SQLite 持久化。
 - 使用 Python 内置 `sqlite3` 和原生 SQL 实现数据访问。
-- 新增仿真结果持久化，保存时间线、资源历史和指标。
+- 机器和任务配置使用 SQLite 持久化；仿真结果不保存历史记录。
 
 #### 仿真核心
 - 新增物理机领域对象与任务领域对象。
@@ -49,7 +49,7 @@
 - 新增概览页面。
 - 新增指标卡片、资源利用率图表和任务时间线图。
 - 新增物理机与任务的前端编辑能力。
-- 新增最近一次仿真摘要展示。
+- 新增算法对比页面。
 
 #### 示例数据与演示支持
 - 新增 `data/sample_machines.json`。
@@ -85,15 +85,12 @@
 
 #### 仿真
 - `POST /api/simulations/run`
-- `GET /api/simulations/latest`
-- `GET /api/simulations/{id}`
-- `GET /api/simulations/{id}/results`
-- `GET /api/simulations/{id}/metrics`
+- `POST /api/simulations/compare`
 
 ### 已完成验证
 
 发布前已完成以下验证：
-- 后端测试通过：`21 passed`
+- 后端测试通过
 - 前端生产构建通过：`npm run build`
 - 健康检查接口可用
 - 示例物理机导入可用
@@ -120,12 +117,12 @@
 此外需要注意：
 - `cfs_like` 是教学用简化实现，不是 Linux CFS 的完整实现。
 - `least_loaded` 当前采用“CPU 利用率优先，内存利用率次之”的简化负载定义。
-- 仿真结果中的复杂结构当前保存在 SQLite 的 JSON 字符串字段中。
+- 仿真结果只在本次 API 响应和当前前端页面中展示，不保存历史记录。
 
 ### 升级建议
 
 后续版本建议优先考虑：
 - `priority`、`sjf`、`edf` 等队列选择策略。
 - 更完整的多维资源均衡策略。
-- 更细粒度的仿真结果结构化存储。
+- 导出仿真结果或设计可选的实验归档能力。
 - 启动脚本、Docker 或部署支持。

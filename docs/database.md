@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS machines (
 - `id`：主键，自增 ID。
 - `name`：物理机名称。
 - `total_cpu`：物理机总 CPU 容量。
-- `total_memory`：物理机总内存容量。
+- `total_memory`：物理机总内存容量，单位为 MB。
 - `enabled`：是否启用。SQLite 没有独立布尔类型，这里使用整数保存：`1` 表示 `true`，`0` 表示 `false`。
 
 ### 2. `tasks`
@@ -57,47 +57,22 @@ CREATE TABLE IF NOT EXISTS tasks (
 - `id`：主键，自增 ID。
 - `name`：任务名称。
 - `required_cpu`：任务需要的 CPU。
-- `required_memory`：任务需要的内存。
+- `required_memory`：任务需要的内存，单位为 MB。
 - `duration`：任务持续时间。
 - `submit_time`：任务提交时间。
 - `priority`：任务优先级，默认值为 `0`。
 - `deadline`：任务截止时间，可以为空。
 
-### 3. `simulations`
-用于保存一次仿真的结果。
+## 为什么不保存仿真历史
+当前版本只持久化机器和任务配置，不保存仿真历史。
 
-```sql
-CREATE TABLE IF NOT EXISTS simulations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    algorithm TEXT NOT NULL,
-    max_time INTEGER NOT NULL,
-    timeline_json TEXT NOT NULL,
-    resource_history_json TEXT NOT NULL,
-    metrics_json TEXT NOT NULL
-);
-```
+这样设计的原因是：
+- 保持教学 demo 更轻量。
+- 避免本地数据库不断积累临时运行结果。
+- 运行仿真和算法对比后，结果直接在当前 API 响应和前端页面中展示。
 
-字段说明：
-- `id`：主键，自增 ID。
-- `algorithm`：本次仿真使用的调度算法。
-- `max_time`：本次仿真的最大运行时间。
-- `timeline_json`：任务执行时间线，使用 JSON 字符串保存。
-- `resource_history_json`：资源利用率历史数据，使用 JSON 字符串保存。
-- `metrics_json`：最终指标，使用 JSON 字符串保存。
-
-## 为什么仿真结果先存 JSON
-`timeline`、`resource_history`、`metrics` 都是结构相对复杂的数据。
-
-MVP 阶段先把它们序列化成 JSON 字符串写入 SQLite，有几个好处：
-- 实现简单，能快速跑通持久化。
-- 不需要一开始就拆很多张表。
-- 方便后续在前端直接读取和还原。
-
-对应代价是：
-- 不适合做复杂 SQL 查询。
-- 不适合做细粒度统计分析。
-
-如果后面要深入学习关系型设计，可以把它进一步拆成例如：
+如果后续需要做实验报告归档，可以再新增导出功能或单独设计结果表，例如：
+- `simulation_runs`
 - `simulation_tasks`
 - `simulation_resource_points`
 - `simulation_metrics`
@@ -145,18 +120,7 @@ INSERT INTO tasks (
 VALUES (?, ?, ?, ?, ?, ?, ?)
 ```
 
-保存仿真结果时：
-
-```sql
-INSERT INTO simulations (
-    algorithm,
-    max_time,
-    timeline_json,
-    resource_history_json,
-    metrics_json
-)
-VALUES (?, ?, ?, ?, ?)
-```
+当前版本不写入仿真结果；仿真结果由 API 直接返回给前端。
 
 ### 3. 查询数据：`SELECT`
 列出物理机：
@@ -173,14 +137,6 @@ ORDER BY id
 SELECT id, name, required_cpu, required_memory, duration, submit_time, priority, deadline
 FROM tasks
 ORDER BY id
-```
-
-查询单条仿真记录：
-
-```sql
-SELECT id, algorithm, max_time, timeline_json, resource_history_json, metrics_json
-FROM simulations
-WHERE id = ?
 ```
 
 这几个例子里可以学到：
@@ -228,7 +184,6 @@ WHERE id = ?
 测试里重置数据库时，也使用了 `DELETE`：
 
 ```sql
-DELETE FROM simulations;
 DELETE FROM tasks;
 DELETE FROM machines;
 ```
@@ -273,7 +228,7 @@ DELETE FROM machines;
 可以重点观察这些问题：
 - 为什么 `enabled` 用整数而不是布尔？
 - 为什么 `deadline` 可以是 `NULL`？
-- 为什么 `simulations` 里有些字段先存 JSON？
+- 为什么当前只把机器和任务作为持久化配置？
 - `INSERT` 后为什么能通过 `lastrowid` 拿到主键？
 
 ## 后续可以练习的内容
@@ -283,4 +238,4 @@ DELETE FROM machines;
 2. 给 tasks 增加按提交时间排序查询
 3. 增加统计接口，练习 `COUNT(*)`
 4. 给常查字段建立索引，观察查询方式变化
-5. 把仿真结果拆表，练习更规范的关系型设计
+5. 如果需要实验归档，再设计仿真结果表，练习更规范的关系型设计

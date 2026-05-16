@@ -11,11 +11,19 @@ DATASET_FILES = {
         "default": "sample_machines.json",
         "balanced": "sample_machines_balanced.json",
         "stress": "sample_machines_stress.json",
+        "fragmented": "sample_machines_fragmented.json",
+        "priority": "sample_machines_priority.json",
+        "deadline": "sample_machines_deadline.json",
+        "burst": "sample_machines_burst.json",
     },
     "tasks": {
         "default": "sample_tasks.json",
         "balanced": "sample_tasks_balanced.json",
         "stress": "sample_tasks_stress.json",
+        "fragmented": "sample_tasks_fragmented.json",
+        "priority": "sample_tasks_priority.json",
+        "deadline": "sample_tasks_deadline.json",
+        "burst": "sample_tasks_burst.json",
     },
 }
 

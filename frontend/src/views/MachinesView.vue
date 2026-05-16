@@ -12,9 +12,16 @@
             <option value="default">默认示例</option>
             <option value="balanced">均衡测试集</option>
             <option value="stress">压力测试集</option>
+            <option value="fragmented">碎片化测试集</option>
+            <option value="priority">优先级测试集</option>
+            <option value="deadline">截止期测试集</option>
+            <option value="burst">突发流量测试集</option>
           </select>
         </label>
         <button class="button secondary" type="button" @click="handleImportSample">导入测试集</button>
+        <button class="button danger" type="button" :disabled="isClearing" @click="handleClearAll">
+          {{ isClearing ? '清空中...' : '清空物理机' }}
+        </button>
         <button class="button" type="button" @click="loadMachines">刷新</button>
       </div>
     </header>
@@ -33,11 +40,11 @@
           <input v-model="form.name" type="text" placeholder="例如：node-a" required />
         </label>
         <label class="field">
-          <span>CPU 总量</span>
+          <span>CPU 总量（核）</span>
           <input v-model.number="form.total_cpu" type="number" min="1" required />
         </label>
         <label class="field">
-          <span>内存总量</span>
+          <span>内存总量（MB）</span>
           <input v-model.number="form.total_memory" type="number" min="1" required />
         </label>
         <label class="checkbox-field">
@@ -69,8 +76,8 @@
         <thead>
           <tr>
             <th>名称</th>
-            <th>CPU</th>
-            <th>内存</th>
+            <th>CPU（核）</th>
+            <th>内存（MB）</th>
             <th>启用</th>
             <th>操作</th>
           </tr>
@@ -102,12 +109,13 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 
-import { createMachine, deleteMachine, importSampleMachines, listMachines, updateMachine } from '../api/machines'
+import { createMachine, deleteAllMachines, deleteMachine, importSampleMachines, listMachines, updateMachine } from '../api/machines'
 
 const machines = ref([])
 const message = ref('')
 const editingMachineId = ref(null)
 const selectedDataset = ref('default')
+const isClearing = ref(false)
 
 const datasetInfo = {
   default: {
@@ -122,13 +130,29 @@ const datasetInfo = {
     title: '压力测试集',
     description: '资源更紧张，适合观察高负载条件下的等待、拥塞与调度差异。',
   },
+  fragmented: {
+    title: '碎片化测试集',
+    description: '机器 CPU/内存比例差异明显，适合观察资源碎片和紧凑/分散放置差异。',
+  },
+  priority: {
+    title: '优先级测试集',
+    description: '少量同构机器承载长任务和高优先级短任务，适合观察任务排序策略。',
+  },
+  deadline: {
+    title: '截止期测试集',
+    description: '中等规模机器搭配紧迫任务，适合观察截止期违约率。',
+  },
+  burst: {
+    title: '突发流量测试集',
+    description: '多台均衡机器承接多波次任务，适合观察突发提交时的负载扩散。',
+  },
 }
 
 function createInitialForm() {
   return {
     name: '',
     total_cpu: 4,
-    total_memory: 8,
+    total_memory: 8192,
     enabled: true,
   }
 }
@@ -193,6 +217,24 @@ async function handleImportSample() {
   await importSampleMachines(selectedDataset.value)
   message.value = `物理机测试集已导入：${selectedDataset.value}`
   await loadMachines()
+}
+
+async function handleClearAll() {
+  isClearing.value = true
+
+  try {
+    const response = await deleteAllMachines()
+    message.value = `已清空 ${response.data.deleted_count} 台物理机。`
+
+    if (editingMachineId.value !== null) {
+      editingMachineId.value = null
+      resetForm()
+    }
+
+    await loadMachines()
+  } finally {
+    isClearing.value = false
+  }
 }
 
 onMounted(loadMachines)

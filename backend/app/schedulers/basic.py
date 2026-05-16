@@ -15,7 +15,7 @@ class BestFitScheduler(Scheduler):
         candidates = [machine for machine in machines if machine.can_fit(task)]
         if not candidates:
             return None
-        return min(candidates, key=lambda machine: machine.available_cpu - task.required_cpu)
+        return min(candidates, key=lambda machine: _remaining_resource_score(machine, task))
 
 
 class WorstFitScheduler(Scheduler):
@@ -23,7 +23,7 @@ class WorstFitScheduler(Scheduler):
         candidates = [machine for machine in machines if machine.can_fit(task)]
         if not candidates:
             return None
-        return max(candidates, key=lambda machine: machine.available_cpu - task.required_cpu)
+        return max(candidates, key=lambda machine: _remaining_resource_score(machine, task))
 
 
 class RoundRobinScheduler(Scheduler):
@@ -99,3 +99,9 @@ def get_scheduler(name: str) -> Scheduler:
         return schedulers[name]()
     except KeyError as exc:
         raise ValueError(f"Unsupported scheduler: {name}") from exc
+
+
+def _remaining_resource_score(machine: Machine, task: Task) -> float:
+    remaining_cpu_ratio = (machine.available_cpu - task.required_cpu) / machine.total_cpu
+    remaining_memory_ratio = (machine.available_memory - task.required_memory) / machine.total_memory
+    return remaining_cpu_ratio + remaining_memory_ratio

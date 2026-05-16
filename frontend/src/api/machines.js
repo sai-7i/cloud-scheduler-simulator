@@ -21,3 +21,7 @@ export function importSampleMachines(dataset) {
 export function deleteMachine(id) {
   return http.delete(`/api/machines/${id}`)
 }
+
+export function deleteAllMachines() {
+  return http.delete('/api/machines')
+}

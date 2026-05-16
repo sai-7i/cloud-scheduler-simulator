@@ -25,3 +25,7 @@ export function generateTasks() {
 export function deleteTask(id) {
   return http.delete(`/api/tasks/${id}`)
 }
+
+export function deleteAllTasks() {
+  return http.delete('/api/tasks')
+}

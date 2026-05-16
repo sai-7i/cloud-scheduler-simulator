@@ -1,0 +1,26 @@
+[
+  {
+    "name": "fragment-cpu-box",
+    "total_cpu": 12,
+    "total_memory": 6144,
+    "enabled": true
+  },
+  {
+    "name": "fragment-memory-box",
+    "total_cpu": 4,
+    "total_memory": 22528,
+    "enabled": true
+  },
+  {
+    "name": "fragment-balanced-box",
+    "total_cpu": 7,
+    "total_memory": 14336,
+    "enabled": true
+  },
+  {
+    "name": "fragment-small-box",
+    "total_cpu": 3,
+    "total_memory": 5120,
+    "enabled": true
+  }
+]

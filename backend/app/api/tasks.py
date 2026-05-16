@@ -29,9 +29,9 @@ def update_task(task_id: int, payload: TaskCreate) -> TaskRead:
 @router.post("/generate", response_model=list[TaskRead])
 def generate_tasks() -> list[TaskRead]:
     samples = [
-        TaskCreate(name="task-1", required_cpu=2, required_memory=4, duration=5, submit_time=0),
-        TaskCreate(name="task-2", required_cpu=3, required_memory=6, duration=8, submit_time=1),
-        TaskCreate(name="task-3", required_cpu=1, required_memory=2, duration=3, submit_time=2),
+        TaskCreate(name="task-1", required_cpu=2, required_memory=4096, duration=5, submit_time=0),
+        TaskCreate(name="task-2", required_cpu=3, required_memory=6144, duration=8, submit_time=1),
+        TaskCreate(name="task-3", required_cpu=1, required_memory=2048, duration=3, submit_time=2),
     ]
     return [store.create_task(task) for task in samples]
 
@@ -39,7 +39,14 @@ def generate_tasks() -> list[TaskRead]:
 @router.post("/import-sample", response_model=list[TaskRead])
 def import_sample_tasks(dataset: str = "default") -> list[TaskRead]:
     samples = load_sample_records("tasks", dataset)
+    store.delete_all_tasks()
     return [store.create_task(TaskCreate(**task)) for task in samples]
+
+
+@router.delete("")
+def delete_all_tasks() -> dict[str, int]:
+    deleted_count = store.delete_all_tasks()
+    return {"deleted_count": deleted_count}
 
 
 @router.delete("/{task_id}")

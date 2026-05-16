@@ -1,47 +1,74 @@
 [
   {
-    "name": "stress-task-1",
-    "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 6,
+    "name": "stress-cpu-blocker",
+    "required_cpu": 5,
+    "required_memory": 4096,
+    "duration": 9,
     "submit_time": 0,
     "priority": 0,
-    "deadline": 8
+    "deadline": 11
   },
   {
-    "name": "stress-task-2",
+    "name": "stress-memory-blocker",
     "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 5,
+    "required_memory": 10240,
+    "duration": 8,
     "submit_time": 0,
-    "priority": 0,
-    "deadline": 8
+    "priority": 1,
+    "deadline": 10
   },
   {
-    "name": "stress-task-3",
-    "required_cpu": 2,
-    "required_memory": 4,
-    "duration": 4,
+    "name": "stress-balanced-blocker",
+    "required_cpu": 3,
+    "required_memory": 6144,
+    "duration": 7,
     "submit_time": 1,
+    "priority": 1,
+    "deadline": 10
+  },
+  {
+    "name": "stress-urgent-small-1",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 2,
+    "submit_time": 0,
+    "priority": 4,
+    "deadline": 3
+  },
+  {
+    "name": "stress-urgent-small-2",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 2,
+    "submit_time": 0,
+    "priority": 4,
+    "deadline": 3
+  },
+  {
+    "name": "stress-cpu-late",
+    "required_cpu": 4,
+    "required_memory": 3072,
+    "duration": 5,
+    "submit_time": 2,
     "priority": 1,
     "deadline": 9
   },
   {
-    "name": "stress-task-4",
-    "required_cpu": 3,
-    "required_memory": 6,
-    "duration": 7,
-    "submit_time": 1,
+    "name": "stress-memory-late",
+    "required_cpu": 2,
+    "required_memory": 7168,
+    "duration": 5,
+    "submit_time": 3,
     "priority": 2,
-    "deadline": 12
+    "deadline": 9
   },
   {
-    "name": "stress-task-5",
-    "required_cpu": 1,
-    "required_memory": 2,
-    "duration": 3,
-    "submit_time": 2,
-    "priority": 1,
-    "deadline": null
+    "name": "stress-oversized-rejected",
+    "required_cpu": 7,
+    "required_memory": 4096,
+    "duration": 4,
+    "submit_time": 4,
+    "priority": 0,
+    "deadline": 12
   }
 ]

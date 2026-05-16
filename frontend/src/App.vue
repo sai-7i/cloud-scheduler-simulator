@@ -14,6 +14,7 @@
         <RouterLink to="/machines">物理机</RouterLink>
         <RouterLink to="/tasks">任务</RouterLink>
         <RouterLink to="/simulations">仿真</RouterLink>
+        <RouterLink to="/compare">算法对比</RouterLink>
       </nav>
     </aside>
 

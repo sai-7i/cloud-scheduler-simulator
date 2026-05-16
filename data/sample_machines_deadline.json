@@ -1,0 +1,20 @@
+[
+  {
+    "name": "deadline-a",
+    "total_cpu": 5,
+    "total_memory": 10240,
+    "enabled": true
+  },
+  {
+    "name": "deadline-b",
+    "total_cpu": 5,
+    "total_memory": 10240,
+    "enabled": true
+  },
+  {
+    "name": "deadline-c",
+    "total_cpu": 3,
+    "total_memory": 6144,
+    "enabled": true
+  }
+]

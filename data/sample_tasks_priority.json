@@ -1,0 +1,56 @@
+[
+  {
+    "name": "low-priority-long-1",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 10,
+    "submit_time": 0,
+    "priority": 0,
+    "deadline": 16
+  },
+  {
+    "name": "low-priority-long-2",
+    "required_cpu": 3,
+    "required_memory": 4096,
+    "duration": 10,
+    "submit_time": 0,
+    "priority": 0,
+    "deadline": 16
+  },
+  {
+    "name": "urgent-short-1",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 2,
+    "submit_time": 0,
+    "priority": 5,
+    "deadline": 4
+  },
+  {
+    "name": "urgent-short-2",
+    "required_cpu": 1,
+    "required_memory": 1024,
+    "duration": 2,
+    "submit_time": 0,
+    "priority": 5,
+    "deadline": 4
+  },
+  {
+    "name": "normal-service-1",
+    "required_cpu": 2,
+    "required_memory": 3072,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 2,
+    "deadline": 8
+  },
+  {
+    "name": "normal-service-2",
+    "required_cpu": 2,
+    "required_memory": 3072,
+    "duration": 4,
+    "submit_time": 1,
+    "priority": 2,
+    "deadline": 8
+  }
+]
