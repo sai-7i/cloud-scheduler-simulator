@@ -1,10 +1,7 @@
 <template>
   <section class="panel chart-panel">
     <div class="chart-header">
-      <div>
-        <p class="section-kicker">图表分析</p>
-        <h3>{{ title }}</h3>
-      </div>
+      <h3>{{ title }}</h3>
       <p class="chart-description">{{ description }}</p>
     </div>
     <div ref="chartRef" class="echart-surface" :style="{ height }"></div>
@@ -47,7 +44,8 @@ function renderChart() {
     return
   }
   if (!chartInstance) {
-    chartInstance = echarts.init(chartRef.value)
+    // 使用暗色主题背景
+    chartInstance = echarts.init(chartRef.value, 'dark', { backgroundColor: 'transparent' })
   }
   chartInstance.setOption(props.option, true)
 }
@@ -66,11 +64,20 @@ watch(
 
 onMounted(() => {
   renderChart()
+  // 为了防止侧边栏动画导致尺寸计算错误，使用 ResizeObserver
+  const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+  });
+  if (chartRef.value) {
+      resizeObserver.observe(chartRef.value);
+  }
+  
   window.addEventListener('resize', handleResize)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize)
-  chartInstance?.dispose()
+  
+  onBeforeUnmount(() => {
+    resizeObserver.disconnect();
+    window.removeEventListener('resize', handleResize)
+    chartInstance?.dispose()
+  })
 })
 </script>

@@ -11,3 +11,5 @@ data/*.sqlite
 data/*.sqlite3
 
 .env
+
+.opencode/
