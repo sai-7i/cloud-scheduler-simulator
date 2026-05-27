@@ -31,6 +31,8 @@
 - `docs/`: design notes, API docs, algorithm docs, and user guide.
 - `data/`: local SQLite database and sample datasets; do not commit generated database files unless explicitly requested.
 - `scripts/`: helper scripts for local setup or sample data generation.
+- `start.bat`: Windows one-click startup script.
+- `start.sh`: Linux/macOS one-click startup script.
 
 ## MVP Scope
 - Physical machine fields: name, total CPU, total memory, enabled/status.

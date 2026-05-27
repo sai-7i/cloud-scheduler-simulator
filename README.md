@@ -13,6 +13,12 @@
 
 当前版本已支持：
 
+- 一键启动
+  - Windows 启动脚本（`start.bat`）
+  - Linux/macOS 启动脚本（`start.sh`）
+  - 自动安装依赖（首次运行）
+  - 同时启动前后端服务
+  - 优雅停止所有服务
 - 物理机管理
   - 新增物理机
   - 编辑物理机
@@ -93,10 +99,37 @@
 - `docs/`：架构、API、算法、数据库和任务文档
 - `data/`：本地数据库和示例数据
 - `scripts/`：预留给启动或辅助脚本
+- `start.bat`：Windows 一键启动脚本
+- `start.sh`：Linux/macOS 一键启动脚本
 
 ## 快速开始
 
-### 1. 启动后端
+### 一键启动（推荐）
+
+使用启动脚本可以一键启动前后端服务，自动处理依赖安装：
+
+**Windows：**
+```bash
+start.bat
+```
+
+**Linux/macOS：**
+```bash
+./start.sh
+```
+
+脚本功能：
+- 首次运行自动创建 Python 虚拟环境并安装后端依赖
+- 首次运行自动安装前端 npm 依赖
+- 后续运行跳过依赖安装，快速启动
+- 同时启动后端（端口 8000）和前端（端口 5173）
+- 按 `Ctrl+C` 优雅停止所有服务
+
+### 手动启动
+
+如需手动控制启动过程，可按以下步骤操作：
+
+#### 1. 启动后端
 
 ```bash
 cd backend
@@ -111,7 +144,7 @@ uvicorn app.main:app --reload
 - 当前项目使用 Pydantic v2，不要回退到 Pydantic v1。
 - 后端健康检查地址：`GET /health`
 
-### 2. 启动前端
+#### 2. 启动前端
 
 ```bash
 cd frontend
@@ -121,7 +154,7 @@ npm run dev
 
 前端开发服务器会通过 Vite 代理访问后端 `/api`。
 
-### 3. 运行测试
+### 运行测试
 
 后端测试：
 
@@ -130,7 +163,7 @@ cd backend
 .venv/bin/pytest
 ```
 
-### 4. 前端构建
+### 前端构建
 
 ```bash
 cd frontend
